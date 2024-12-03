@@ -3,19 +3,30 @@
   "packageManager": "yarn@4.5.3",
   "version": "0.0.0",
   "description": "Repo to gather answers to te advent of code challenge",
-  "main": "index.js",
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/adambullmer/advent-of-code.git"
   },
   "author": "Adam Bullmer <psycodrumfreak@gmail.com>",
   "license": "Unlicense",
+  "homepage": "https://github.com/adambullmer/advent-of-code#readme",
   "bugs": {
     "url": "https://github.com/adambullmer/advent-of-code/issues"
   },
-  "homepage": "https://github.com/adambullmer/advent-of-code#readme"
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "format": "yarn run format:$(test -z \"${CI:-}\" && echo 'local' || echo 'ci')",
+    "format:runner": "yarn run biome format ./src",
+    "format:local": "yarn run format:runner --write",
+    "format:ci": "yarn run format:runner",
+    "lint": "yarn run lint:$(test -z \"${CI:-}\" && echo 'local' || echo 'ci')",
+    "lint:runner": "yarn run biome check ./src",
+    "lint:local": "yarn run lint:runner --write",
+    "lint:ci": "yarn run lint:runner",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  }
 }
