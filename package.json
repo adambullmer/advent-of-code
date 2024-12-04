@@ -15,7 +15,11 @@
   },
   "main": "index.js",
   "type": "module",
+  "bin": "./dist/index.js",
   "scripts": {
+    "clean": "rm -rf dist",
+    "build": "yarn run clean && yarn run tsc -p tsconfig.json && rsync -am --include='*/' --include='**/__fixtures__/*' --exclude='*' src/ dist/",
+    "start": "yarn run build && yarn run advent-of-code",
     "format": "yarn run format:$(test -z \"${CI:-}\" && echo 'local' || echo 'ci')",
     "format:runner": "yarn run biome format ./src",
     "format:local": "yarn run format:runner --write",
@@ -27,6 +31,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4"
+    "@biomejs/biome": "1.9.4",
+    "@inquirer/prompts": "^7.1.0",
+    "@types/node": "^22.0.0",
+    "@types/yargs": "^17.0.33",
+    "typescript": "^5.7.2",
+    "yargs": "^17.7.2"
   }
 }
