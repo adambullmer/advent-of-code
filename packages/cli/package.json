@@ -1,5 +1,5 @@
 {
-  "name": "advent-of-code",
+  "name": "advent-of-code-cli",
   "packageManager": "yarn@4.5.3",
   "version": "0.0.0",
   "description": "Repo to gather answers to te advent of code challenge",
@@ -32,9 +32,12 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@inquirer/prompts": "^7.1.0",
     "@types/node": "^22.0.0",
+    "@types/yargs": "^17.0.33",
     "aocrunner": "^1.10.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "yargs": "^17.7.2"
   },
   "workspaces": [
     "packages/*"
