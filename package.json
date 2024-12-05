@@ -17,9 +17,6 @@
   "type": "module",
   "bin": "./dist/index.js",
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "yarn run clean && yarn run tsc -p tsconfig.json && rsync -am --include='*/' --include='**/__fixtures__/*' --exclude='*' src/ dist/",
-    "start": "yarn run build && yarn run advent-of-code",
     "format": "yarn run format:$(test -z \"${CI:-}\" && echo 'local' || echo 'ci')",
     "format:runner": "yarn run biome format ./src",
     "format:local": "yarn run format:runner --write",
