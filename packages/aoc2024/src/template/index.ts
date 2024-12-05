@@ -18,7 +18,9 @@ run({
   part1: {
     tests: [
       // {
-      //   input: ``,
+      //   input: `
+      //     1
+      //   `,
       //   expected: "",
       // },
     ],
@@ -28,7 +30,7 @@ run({
     tests: [
       // {
       //   input: `
-      //
+      //     1
       //   `,
       //   expected: "",
       // },
@@ -36,5 +38,5 @@ run({
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: false,
+  onlyTests: true,
 });
