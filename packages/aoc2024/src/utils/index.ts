@@ -29,3 +29,21 @@
  *     import { myUtil } from '../utils'
  *
  */
+
+export type Coordinates = [number, number];
+
+export const directions: Record<string, Coordinates> = {
+  Up: [0, -1],
+  Down: [0, 1],
+  Left: [-1, 0],
+  Right: [1, 0],
+
+  UpRight: [1, -1],
+  DownRight: [1, 1],
+  UpLeft: [-1, -1],
+  DownLeft: [-1, 1],
+};
+
+export function calculateCoordinates([x, y]: Coordinates, [dx, dy]: Coordinates): Coordinates {
+  return [x + dx, y + dy];
+}

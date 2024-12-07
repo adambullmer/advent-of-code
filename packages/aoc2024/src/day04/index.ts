@@ -1,19 +1,7 @@
 import run from "aocrunner";
+import { calculateCoordinates, type Coordinates, directions } from "../utils/index.js";
 
 type Grid = string[][];
-type Coordinates = [number, number];
-
-const directions: Record<string, Coordinates> = {
-  Up: [0, -1],
-  Down: [0, 1],
-  Left: [-1, 0],
-  Right: [1, 0],
-
-  UpRight: [1, -1],
-  DownRight: [1, 1],
-  UpLeft: [-1, -1],
-  DownLeft: [-1, 1],
-};
 
 const parseInput = (rawInput: string) => {
   const grid: string[][] = [];
@@ -87,10 +75,6 @@ const part1 = (rawInput: string) => {
 
   return foundWords;
 };
-
-function calculateCoordinates([x, y]: Coordinates, [dx, dy]: Coordinates): Coordinates {
-  return [x + dx, y + dy];
-}
 
 function getNextCharacter(grid: Grid, coordinates: Coordinates, direction: Coordinates): string {
   const [x, y] = calculateCoordinates(coordinates, direction);
