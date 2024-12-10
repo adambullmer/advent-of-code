@@ -27,7 +27,8 @@ export async function solution(input: string) {
   const rightOccurrences = aggregateList(right);
 
   return left.reduce((total, leftNumber) => {
-    const similarityScore = leftNumber * (rightOccurrences.get(leftNumber) ?? 0);
+    const similarityScore =
+      leftNumber * (rightOccurrences.get(leftNumber) ?? 0);
 
     return total + similarityScore;
   }, 0);

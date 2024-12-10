@@ -68,7 +68,11 @@ class Grid {
   }
 
   toString() {
-    return this.cells.map((line) => line.map((cell) => cell.toChar()).join("")).join("\n") + "\n";
+    return (
+      this.cells
+        .map((line) => line.map((cell) => cell.toChar()).join(""))
+        .join("\n") + "\n"
+    );
   }
 }
 
@@ -106,7 +110,10 @@ function isCoordinateInBounds([x, y]: Coordinates, grid: Grid) {
   return true;
 }
 
-function calculateSlope([x1, y1]: Coordinates, [x2, y2]: Coordinates): Coordinates {
+function calculateSlope(
+  [x1, y1]: Coordinates,
+  [x2, y2]: Coordinates,
+): Coordinates {
   return [x2 - x1, y2 - y1];
 }
 
@@ -144,7 +151,8 @@ const part1 = (rawInput: string) => {
   }
   console.log(grid.toString());
 
-  return grid.cells.flat().filter((cell) => cell instanceof InterferenceCell).length;
+  return grid.cells.flat().filter((cell) => cell instanceof InterferenceCell)
+    .length;
 };
 
 const part2 = (rawInput: string) => {
@@ -159,7 +167,8 @@ const part2 = (rawInput: string) => {
   }
   console.log(grid.toString());
 
-  return grid.cells.flat().filter((cell) => cell instanceof InterferenceCell).length;
+  return grid.cells.flat().filter((cell) => cell instanceof InterferenceCell)
+    .length;
 };
 
 const input = `

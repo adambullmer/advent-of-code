@@ -1,5 +1,9 @@
 import run from "aocrunner";
-import { calculateCoordinates, type Coordinates, directions } from "../utils/index.js";
+import {
+  calculateCoordinates,
+  type Coordinates,
+  directions,
+} from "../utils/index.js";
 
 enum CellChar {
   Open = ".",
@@ -117,7 +121,10 @@ class Grid {
 
   moveGuard() {
     const guard = this.guard;
-    const nextCoords = calculateCoordinates([this.guard.x, this.guard.y], guard.getCoordinateDelta());
+    const nextCoords = calculateCoordinates(
+      [this.guard.x, this.guard.y],
+      guard.getCoordinateDelta(),
+    );
 
     // If next move is out of bounds
     if (
@@ -137,11 +144,17 @@ class Grid {
       return true;
     }
 
-    if (this.getCell([this.guard.x, this.guard.y]) instanceof VisitedCell === false) {
+    if (
+      this.getCell([this.guard.x, this.guard.y]) instanceof VisitedCell ===
+      false
+    ) {
       this.setCell(new VisitedCell([guard.x, guard.y]));
     }
 
-    const previousCell = this.getCell([this.guard.x, this.guard.y]) as VisitedCell;
+    const previousCell = this.getCell([
+      this.guard.x,
+      this.guard.y,
+    ]) as VisitedCell;
     if (previousCell.direction.includes(guard.direction)) {
       return false;
     }
@@ -153,7 +166,11 @@ class Grid {
   }
 
   toString() {
-    return this.cells.map((row) => row.map((cell) => cell.toChar()).join("")).join("\n") + "\n";
+    return (
+      this.cells
+        .map((row) => row.map((cell) => cell.toChar()).join(""))
+        .join("\n") + "\n"
+    );
   }
 }
 
@@ -189,7 +206,8 @@ const part1 = (rawInput: string) => {
   }
   console.log(input.toString(), input.guard.x, input.guard.y);
 
-  return input.cells.flatMap((a) => a).filter((a) => a instanceof VisitedCell).length;
+  return input.cells.flatMap((a) => a).filter((a) => a instanceof VisitedCell)
+    .length;
 };
 
 const part2 = (rawInput: string) => {
@@ -200,7 +218,9 @@ const part2 = (rawInput: string) => {
     // console.log(input.toString(), input.guardCoord);
   }
 
-  const visited = input.cells.flatMap((a) => a).filter((a) => a instanceof VisitedCell);
+  const visited = input.cells
+    .flatMap((a) => a)
+    .filter((a) => a instanceof VisitedCell);
 
   let loopCount = 0;
   for (const cell of visited) {

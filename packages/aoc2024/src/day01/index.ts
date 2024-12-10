@@ -40,7 +40,8 @@ const part2 = (rawInput: string) => {
   const rightOccurrences = aggregateOccurrences(right);
 
   return left.reduce((total, leftNumber) => {
-    const similarityScore = leftNumber * (rightOccurrences.get(leftNumber) ?? 0);
+    const similarityScore =
+      leftNumber * (rightOccurrences.get(leftNumber) ?? 0);
 
     return total + similarityScore;
   }, 0);

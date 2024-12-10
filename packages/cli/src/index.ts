@@ -73,7 +73,9 @@ async function main() {
   }
 
   if (args.day === undefined) {
-    const dayOptions = (await readdir(`./src/${args.year}`, { withFileTypes: true }))
+    const dayOptions = (
+      await readdir(`./src/${args.year}`, { withFileTypes: true })
+    )
       .filter((item) => item.isDirectory())
       .map((item) => item.name);
     args.day = await select({
@@ -91,7 +93,8 @@ async function main() {
     });
   }
 
-  const parts = partOptions.find((item) => item.name === args.part)?.value ?? [];
+  const parts =
+    partOptions.find((item) => item.name === args.part)?.value ?? [];
 
   for (const part of parts) {
     const isTest = args._[0] === "test";
@@ -103,14 +106,19 @@ async function main() {
         encoding: "ascii",
       },
     );
-    const { solution } = await import(`${import.meta.dirname}/${args.year}/${args.day}/solution${part}.js`);
+    const { solution } = await import(
+      `${import.meta.dirname}/${args.year}/${args.day}/solution${part}.js`
+    );
     const result = await solution(input);
 
     if (isTest) {
       const output = (
-        await readFile(`${import.meta.dirname}/${args.year}/${args.day}/__fixtures__/output${fixtureFileSuffix}`, {
-          encoding: "ascii",
-        })
+        await readFile(
+          `${import.meta.dirname}/${args.year}/${args.day}/__fixtures__/output${fixtureFileSuffix}`,
+          {
+            encoding: "ascii",
+          },
+        )
       ).trim();
       const resultMatches = `${result}` === `${output}`;
       console.log(

@@ -48,7 +48,10 @@ const part2 = (rawInput: string) => {
   const reports = parseInput(rawInput);
 
   return reports.filter((levels) => {
-    return [levels, ...levels.map((_, index) => removeItemAt(levels, index))].some(checkLevels);
+    return [
+      levels,
+      ...levels.map((_, index) => removeItemAt(levels, index)),
+    ].some(checkLevels);
   }).length;
 };
 

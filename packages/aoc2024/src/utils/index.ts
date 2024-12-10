@@ -44,6 +44,9 @@ export const directions: Record<string, Coordinates> = {
   DownLeft: [-1, 1],
 };
 
-export function calculateCoordinates([x, y]: Coordinates, [dx, dy]: Coordinates): Coordinates {
+export function calculateCoordinates(
+  [x, y]: Coordinates,
+  [dx, dy]: Coordinates,
+): Coordinates {
   return [x + dx, y + dy];
 }

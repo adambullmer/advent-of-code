@@ -15,7 +15,9 @@ interface Calibration {
 
 const parseInput = (rawInput: string): Calibration[] => {
   return rawInput.split("\n").map((line) => {
-    const [expected, ...inputs] = line.split(/:?\s+/g).map((num) => parseInt(num, 10));
+    const [expected, ...inputs] = line
+      .split(/:?\s+/g)
+      .map((num) => parseInt(num, 10));
     // const operations = new Array(inputs.length - 1).fill(Operation.Add);
 
     // If it's evenly divisible, it is possibly a multiple
@@ -47,7 +49,11 @@ const add = (x: number, y: number): number => x + y;
 const multiply = (x: number, y: number): number => x * y;
 const concatenate = (x: number, y: number): number => parseInt(`${x}${y}`, 10);
 
-function recurseMath(expected: number, total: number, inputs: number[]): boolean {
+function recurseMath(
+  expected: number,
+  total: number,
+  inputs: number[],
+): boolean {
   if (inputs.length === 0) {
     // console.log(expected, total);
     return expected === total;
@@ -75,7 +81,13 @@ const part1 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
   return input
-    .filter((calibration) => recurseMath(calibration.expected, calibration.inputs[0], calibration.inputs.slice(1)))
+    .filter((calibration) =>
+      recurseMath(
+        calibration.expected,
+        calibration.inputs[0],
+        calibration.inputs.slice(1),
+      ),
+    )
     .reduce((total, { expected }) => total + expected, 0);
 };
 
@@ -83,7 +95,13 @@ const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
   return input
-    .filter((calibration) => recurseMath(calibration.expected, calibration.inputs[0], calibration.inputs.slice(1)))
+    .filter((calibration) =>
+      recurseMath(
+        calibration.expected,
+        calibration.inputs[0],
+        calibration.inputs.slice(1),
+      ),
+    )
     .reduce((total, { expected }) => total + expected, 0);
 };
 

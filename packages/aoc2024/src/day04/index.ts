@@ -1,5 +1,9 @@
 import run from "aocrunner";
-import { calculateCoordinates, type Coordinates, directions } from "../utils/index.js";
+import {
+  calculateCoordinates,
+  type Coordinates,
+  directions,
+} from "../utils/index.js";
 
 type Grid = string[][];
 
@@ -15,7 +19,12 @@ const parseInput = (rawInput: string) => {
 const word = "XMAS".split("");
 const cross = word.slice(1);
 
-function checkMatches(grid: Grid, [x, y]: Coordinates, direction: Coordinates, currentIndex: number): boolean {
+function checkMatches(
+  grid: Grid,
+  [x, y]: Coordinates,
+  direction: Coordinates,
+  currentIndex: number,
+): boolean {
   // console.log(grid[y][x], word[currentIndex]);
   if (currentIndex === word.length) {
     // console.log(true);
@@ -25,7 +34,12 @@ function checkMatches(grid: Grid, [x, y]: Coordinates, direction: Coordinates, c
     // console.log(false);
     return false;
   }
-  return checkMatches(grid, calculateCoordinates([x, y], direction), direction, currentIndex + 1);
+  return checkMatches(
+    grid,
+    calculateCoordinates([x, y], direction),
+    direction,
+    currentIndex + 1,
+  );
 }
 
 const part1 = (rawInput: string) => {
@@ -57,16 +71,32 @@ const part1 = (rawInput: string) => {
         if (hasRight && checkMatches(input, [x, y], directions.Right, 0)) {
           foundWords++;
         }
-        if (hasDown && hasLeft && checkMatches(input, [x, y], directions.DownLeft, 0)) {
+        if (
+          hasDown &&
+          hasLeft &&
+          checkMatches(input, [x, y], directions.DownLeft, 0)
+        ) {
           foundWords++;
         }
-        if (hasUp && hasLeft && checkMatches(input, [x, y], directions.UpLeft, 0)) {
+        if (
+          hasUp &&
+          hasLeft &&
+          checkMatches(input, [x, y], directions.UpLeft, 0)
+        ) {
           foundWords++;
         }
-        if (hasDown && hasRight && checkMatches(input, [x, y], directions.DownRight, 0)) {
+        if (
+          hasDown &&
+          hasRight &&
+          checkMatches(input, [x, y], directions.DownRight, 0)
+        ) {
           foundWords++;
         }
-        if (hasUp && hasRight && checkMatches(input, [x, y], directions.UpRight, 0)) {
+        if (
+          hasUp &&
+          hasRight &&
+          checkMatches(input, [x, y], directions.UpRight, 0)
+        ) {
           foundWords++;
         }
       }
@@ -76,7 +106,11 @@ const part1 = (rawInput: string) => {
   return foundWords;
 };
 
-function getNextCharacter(grid: Grid, coordinates: Coordinates, direction: Coordinates): string {
+function getNextCharacter(
+  grid: Grid,
+  coordinates: Coordinates,
+  direction: Coordinates,
+): string {
   const [x, y] = calculateCoordinates(coordinates, direction);
   return grid[y][x];
 }
@@ -86,7 +120,9 @@ function isCrossCorner(letter: string) {
 }
 
 function checkCrossMatch(corner1: string, corner2: string) {
-  return isCrossCorner(corner1) && isCrossCorner(corner2) && corner1 !== corner2;
+  return (
+    isCrossCorner(corner1) && isCrossCorner(corner2) && corner1 !== corner2
+  );
 }
 
 function checkAround(grid: Grid, coordinates: Coordinates): boolean {

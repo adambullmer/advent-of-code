@@ -37,7 +37,9 @@ const part1 = (rawInput: string) => {
   const compactIds = compactDiskIds(fileIds);
   console.log(compactIds.join(""));
 
-  return compactIds.slice(0, compactIds.indexOf(".")).reduce((t, x, i) => t + parseInt(x, 10) * i, 0);
+  return compactIds
+    .slice(0, compactIds.indexOf("."))
+    .reduce((t, x, i) => t + parseInt(x, 10) * i, 0);
 };
 
 function transformMapToIdFiles(rawBlocks: string[]) {
@@ -61,7 +63,9 @@ function compactDiskFiles(diskIds: string[][]) {
     }
 
     const fileLength = diskIds[x].length;
-    const availableSpace = diskIds.findIndex((chunk) => chunk.filter((char) => char === ".").length >= fileLength);
+    const availableSpace = diskIds.findIndex(
+      (chunk) => chunk.filter((char) => char === ".").length >= fileLength,
+    );
     if (availableSpace === -1 || availableSpace > x) {
       continue;
     }
