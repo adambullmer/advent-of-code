@@ -60,10 +60,6 @@ class Grid {
   }
 
   setCell(cell: Cell) {
-    if (cell.y >= this.cells.length || cell.y < 0 || cell.x < 0 || cell.x >= this.cells[0].length) {
-      return;
-    }
-
     this.cells[cell.y][cell.x] = cell;
   }
 
@@ -102,19 +98,34 @@ const parseInput = (rawInput: string) => {
   return { antennaPairs, grid };
 };
 
+function isCoordinateInBounds([x, y]: Coordinates, grid: Grid) {
+  if (y >= grid.cells.length || y < 0 || x < 0 || x >= grid.cells[0].length) {
+    return false;
+  }
+
+  return true;
+}
+
 function calculateSlope([x1, y1]: Coordinates, [x2, y2]: Coordinates): Coordinates {
   return [x2 - x1, y2 - y1];
 }
 
-function iteratePairs(coordinates: Coordinates[]) {
+function iteratePairs(coordinates: Coordinates[], grid: Grid, repeat = false) {
   const interferenceCoordinates: Coordinates[] = [];
 
   for (let x = 0; x < coordinates.length; x++) {
     const remainingCoordinates = coordinates.filter((_, y) => x !== y);
     for (const coord of remainingCoordinates) {
       const slope = calculateSlope(coordinates[x], coord);
-      const newCoordinate = calculateCoordinates(coord, slope);
-      interferenceCoordinates.push(newCoordinate);
+      const originCoordinate = repeat ? coordinates[x] : coord;
+      let newCoordinate = calculateCoordinates(originCoordinate, slope);
+      while (isCoordinateInBounds(newCoordinate, grid)) {
+        interferenceCoordinates.push(newCoordinate);
+        if (repeat === false) {
+          break;
+        }
+        newCoordinate = calculateCoordinates(newCoordinate, slope);
+      }
     }
   }
 
@@ -127,7 +138,7 @@ const part1 = (rawInput: string) => {
   console.log(grid.toString());
 
   for (const key in input.antennaPairs) {
-    iteratePairs(input.antennaPairs[key])
+    iteratePairs(input.antennaPairs[key], grid)
       .map((coordinate) => new InterferenceCell(coordinate))
       .forEach((cell) => grid.setCell(cell));
   }
@@ -138,8 +149,17 @@ const part1 = (rawInput: string) => {
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
+  const grid = new Grid(input.grid);
+  console.log(grid.toString());
 
-  return;
+  for (const key in input.antennaPairs) {
+    iteratePairs(input.antennaPairs[key], grid, true)
+      .map((coordinate) => new InterferenceCell(coordinate))
+      .forEach((cell) => grid.setCell(cell));
+  }
+  console.log(grid.toString());
+
+  return grid.cells.flat().filter((cell) => cell instanceof InterferenceCell).length;
 };
 
 const input = `
@@ -163,9 +183,26 @@ run({
     solution: part1,
   },
   part2: {
-    tests: [{ input, expected: 1 }],
+    tests: [
+      {
+        input: `
+          T.........
+          ...T......
+          .T........
+          ..........
+          ..........
+          ..........
+          ..........
+          ..........
+          ..........
+          ..........
+        `,
+        expected: 9,
+      },
+      { input, expected: 34 },
+    ],
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 });
