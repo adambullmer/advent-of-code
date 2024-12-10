@@ -40,10 +40,51 @@ const part1 = (rawInput: string) => {
   return compactIds.slice(0, compactIds.indexOf(".")).reduce((t, x, i) => t + parseInt(x, 10) * i, 0);
 };
 
-const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput);
+function transformMapToIdFiles(rawBlocks: string[]) {
+  return rawBlocks.map((char, i) => {
+    const num = parseInt(char, 10);
+    const id = i % 2 === 0 ? `${i / 2}` : ".";
+    return Array(num).fill(id);
+  });
+}
 
-  return;
+function compactDiskFiles(diskIds: string[][]) {
+  for (let x = diskIds.length - 1; x > 0; x--) {
+    if (diskIds[x].length === 0) {
+      continue;
+    }
+    if (diskIds[x][0] === ".") {
+      continue;
+    }
+    if (parseInt(diskIds[x][0], 10) >= x) {
+      continue;
+    }
+
+    const fileLength = diskIds[x].length;
+    const availableSpace = diskIds.findIndex((chunk) => chunk.filter((char) => char === ".").length >= fileLength);
+    if (availableSpace === -1 || availableSpace > x) {
+      continue;
+    }
+
+    const firstOpenIndex = diskIds[availableSpace].indexOf(".");
+    diskIds[availableSpace].splice(firstOpenIndex, fileLength, ...diskIds[x]);
+    diskIds[x].fill(".");
+  }
+
+  return diskIds;
+}
+
+const part2 = (rawInput: string) => {
+  const rawMap = parseInput(rawInput);
+  const fileIds = transformMapToIdFiles(rawMap);
+  console.log(fileIds.flat().join(""));
+  const compactFiles = compactDiskFiles(fileIds);
+  console.log(fileIds.flat().join(""));
+
+  return compactFiles
+    .flat()
+    .map((char) => (char === "." ? 0 : parseInt(char, 10)))
+    .reduce((t, x, i) => t + x * i, 0);
 };
 
 const input = `
@@ -63,5 +104,5 @@ run({
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 });
