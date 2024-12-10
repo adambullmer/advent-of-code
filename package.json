@@ -20,7 +20,7 @@
     "start": "yarn workspace \"aoc${0}\" run start ${1}",
     "generate:year": "yarn run aocrunner init \"packages/aoc${0}\"",
     "format": "yarn run format:$(test -z \"${CI:-}\" && echo 'local' || echo 'ci')",
-    "format:runner": "yarn run biome format ./src",
+    "format:runner": "yarn run biome format ./packages/*/src",
     "format:local": "yarn run format:runner --write",
     "format:ci": "yarn run format:runner",
     "lint": "yarn run lint:$(test -z \"${CI:-}\" && echo 'local' || echo 'ci')",
