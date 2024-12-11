@@ -17,7 +17,7 @@ const parseInput = (rawInput: string): Calibration[] => {
   return rawInput.split("\n").map((line) => {
     const [expected, ...inputs] = line
       .split(/:?\s+/g)
-      .map((num) => parseInt(num, 10));
+      .map((num) => Number.parseInt(num, 10));
     // const operations = new Array(inputs.length - 1).fill(Operation.Add);
 
     // If it's evenly divisible, it is possibly a multiple
@@ -47,7 +47,8 @@ const parseInput = (rawInput: string): Calibration[] => {
 
 const add = (x: number, y: number): number => x + y;
 const multiply = (x: number, y: number): number => x * y;
-const concatenate = (x: number, y: number): number => parseInt(`${x}${y}`, 10);
+const concatenate = (x: number, y: number): number =>
+  Number.parseInt(`${x}${y}`, 10);
 
 function recurseMath(
   expected: number,

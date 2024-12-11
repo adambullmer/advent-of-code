@@ -4,7 +4,7 @@ const parseInput = (rawInput: string) => rawInput.split("");
 
 function transformMapToIdBlocks(rawMap: string[]) {
   return rawMap.flatMap((char, i) => {
-    const num = parseInt(char, 10);
+    const num = Number.parseInt(char, 10);
     const id = i % 2 === 0 ? `${i / 2}` : ".";
     return Array(num).fill(id);
   });
@@ -39,12 +39,12 @@ const part1 = (rawInput: string) => {
 
   return compactIds
     .slice(0, compactIds.indexOf("."))
-    .reduce((t, x, i) => t + parseInt(x, 10) * i, 0);
+    .reduce((t, x, i) => t + Number.parseInt(x, 10) * i, 0);
 };
 
 function transformMapToIdFiles(rawBlocks: string[]) {
   return rawBlocks.map((char, i) => {
-    const num = parseInt(char, 10);
+    const num = Number.parseInt(char, 10);
     const id = i % 2 === 0 ? `${i / 2}` : ".";
     return Array(num).fill(id);
   });
@@ -58,7 +58,7 @@ function compactDiskFiles(diskIds: string[][]) {
     if (diskIds[x][0] === ".") {
       continue;
     }
-    if (parseInt(diskIds[x][0], 10) >= x) {
+    if (Number.parseInt(diskIds[x][0], 10) >= x) {
       continue;
     }
 
@@ -87,7 +87,7 @@ const part2 = (rawInput: string) => {
 
   return compactFiles
     .flat()
-    .map((char) => (char === "." ? 0 : parseInt(char, 10)))
+    .map((char) => (char === "." ? 0 : Number.parseInt(char, 10)))
     .reduce((t, x, i) => t + x * i, 0);
 };
 

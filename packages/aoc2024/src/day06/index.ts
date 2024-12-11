@@ -1,7 +1,7 @@
 import run from "aocrunner";
 import {
-  calculateCoordinates,
   type Coordinates,
+  calculateCoordinates,
   directions,
 } from "../utils/index.js";
 
@@ -17,8 +17,8 @@ enum CellChar {
 }
 
 abstract class Cell {
-  x: number = 0;
-  y: number = 0;
+  x = 0;
+  y = 0;
 
   constructor(coord: Coordinates) {
     this.setCoordinate(coord);
@@ -206,8 +206,7 @@ const part1 = (rawInput: string) => {
   }
   console.log(input.toString(), input.guard.x, input.guard.y);
 
-  return input.cells.flatMap((a) => a).filter((a) => a instanceof VisitedCell)
-    .length;
+  return input.cells.flat().filter((a) => a instanceof VisitedCell).length;
 };
 
 const part2 = (rawInput: string) => {
@@ -218,9 +217,7 @@ const part2 = (rawInput: string) => {
     // console.log(input.toString(), input.guardCoord);
   }
 
-  const visited = input.cells
-    .flatMap((a) => a)
-    .filter((a) => a instanceof VisitedCell);
+  const visited = input.cells.flat().filter((a) => a instanceof VisitedCell);
 
   let loopCount = 0;
   for (const cell of visited) {

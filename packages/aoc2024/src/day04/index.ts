@@ -1,7 +1,7 @@
 import run from "aocrunner";
 import {
-  calculateCoordinates,
   type Coordinates,
+  calculateCoordinates,
   directions,
 } from "../utils/index.js";
 

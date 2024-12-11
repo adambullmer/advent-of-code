@@ -13,7 +13,7 @@ const part1 = (rawInput: string) => {
     if (!match[0].startsWith("mul")) {
       continue;
     }
-    total += parseInt(match[3], 10) * parseInt(match[4], 10);
+    total += Number.parseInt(match[3], 10) * Number.parseInt(match[4], 10);
   }
 
   return total;
@@ -35,7 +35,7 @@ const part2 = (rawInput: string) => {
       continue;
     }
 
-    total += parseInt(match[3], 10) * parseInt(match[4], 10);
+    total += Number.parseInt(match[3], 10) * Number.parseInt(match[4], 10);
   }
 
   return total;

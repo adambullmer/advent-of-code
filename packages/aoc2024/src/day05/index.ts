@@ -84,7 +84,7 @@ const part1 = (rawInput: string) => {
     .filter((update) => filterValidRules(rules, update))
     .map((update) => {
       const middle = (update.length - 1) / 2;
-      return parseInt(update[middle], 10);
+      return Number.parseInt(update[middle], 10);
     })
     .reduce((total, page) => total + page, 0);
 };
@@ -101,7 +101,7 @@ const part2 = (rawInput: string) => {
     .map((update) => fixInvalidUpdate(rules, update))
     .map((update) => {
       const middle = (update.length - 1) / 2;
-      return parseInt(update[middle], 10);
+      return Number.parseInt(update[middle], 10);
     })
     .reduce((total, page) => total + page, 0);
 };

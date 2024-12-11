@@ -6,7 +6,7 @@ const parseInput = (rawInput: string) => {
     if (line === "") {
       continue;
     }
-    const levels = line.split(/\s+/).map((item) => parseInt(item, 10));
+    const levels = line.split(/\s+/).map((item) => Number.parseInt(item, 10));
     reports.push(levels);
   }
 

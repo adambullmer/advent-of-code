@@ -24,7 +24,7 @@
     "format:local": "yarn run format:runner --write",
     "format:ci": "yarn run format:runner",
     "lint": "yarn run lint:$(test -z \"${CI:-}\" && echo 'local' || echo 'ci')",
-    "lint:runner": "yarn run biome check ./src",
+    "lint:runner": "yarn run biome check ./packages/*/src",
     "lint:local": "yarn run lint:runner --write",
     "lint:ci": "yarn run lint:runner",
     "test": "echo \"Error: no test specified\" && exit 1"
