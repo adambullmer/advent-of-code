@@ -1,5 +1,9 @@
 import run from "aocrunner";
-import { type Coordinates, calculateCoordinates, directions } from "../utils/index.js";
+import {
+  type Coordinates,
+  calculateCoordinates,
+  directions,
+} from "../utils/index.js";
 
 class Cell {
   x = 0;
@@ -51,7 +55,9 @@ class Grid {
   }
 
   toString() {
-    const gridString = this.cells.map((line) => line.map((cell) => cell.toChar()).join("")).join("\n");
+    const gridString = this.cells
+      .map((line) => line.map((cell) => cell.toChar()).join(""))
+      .join("\n");
     return `${gridString}\n`;
   }
 }
@@ -85,31 +91,48 @@ function isCoordinateInBounds([x, y]: Coordinates, grid: Cell[][]) {
   return true;
 }
 
-const directionOptions = [directions.Right, directions.Down, directions.Left, directions.Up];
+const directionOptions = [
+  directions.Right,
+  directions.Down,
+  directions.Left,
+  directions.Up,
+];
 function* iterateDirections(coord: Coordinates, grid: Grid) {
   const elevation = (grid.getCell(coord) as TrailCell).elevation;
   const nextElevation = elevation + 1;
 
   for (const delta of directionOptions) {
     const nextCoord = calculateCoordinates(coord, delta);
-    if (isCoordinateInBounds(nextCoord, grid.cells) && `${nextElevation}` === grid.getCell(nextCoord).toChar()) {
+    if (
+      isCoordinateInBounds(nextCoord, grid.cells) &&
+      `${nextElevation}` === grid.getCell(nextCoord).toChar()
+    ) {
       yield nextCoord;
     }
   }
 }
 
-function recurseTrail(completeTrails: Coordinates[], coord: Coordinates, grid: Grid) {
+function recurseTrail(
+  completeTrails: Coordinates[],
+  coord: Coordinates,
+  grid: Grid,
+  isDistinct = false,
+) {
   const current = (grid.getCell(coord) as TrailCell).elevation;
 
   if (current === 9) {
-    if (completeTrails.findIndex(([x, y]) => x === coord[0] && y === coord[1]) === -1) {
+    if (
+      isDistinct === true ||
+      completeTrails.findIndex(([x, y]) => x === coord[0] && y === coord[1]) ===
+        -1
+    ) {
       completeTrails.push(coord);
     }
     return true;
   }
 
   for (const direction of iterateDirections(coord, grid)) {
-    recurseTrail(completeTrails, direction, grid);
+    recurseTrail(completeTrails, direction, grid, isDistinct);
   }
 }
 
@@ -133,8 +156,20 @@ const part1 = (rawInput: string) => {
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
+  const grid = new Grid(input.grid);
 
-  return;
+  console.log(grid.toString());
+
+  const allTrails: Coordinates[] = [];
+  for (const trailhead of input.origins) {
+    const found: Coordinates[] = [];
+    recurseTrail(found, trailhead, grid, true);
+    allTrails.push(...found);
+  }
+
+  // console.log(allTrails);
+
+  return allTrails.length;
 };
 
 const input = `
@@ -192,9 +227,46 @@ run({
     solution: part1,
   },
   part2: {
-    tests: [{ input, expected: 1 }],
+    tests: [
+      {
+        input: `
+          .....0.
+          ..4321.
+          ..5..2.
+          ..6543.
+          ..7..4.
+          ..8765.
+          ..9....
+        `,
+        expected: 3,
+      },
+      {
+        input: `
+          ..90..9
+          ...1.98
+          ...2..7
+          6543456
+          765.987
+          876....
+          987....
+        `,
+        expected: 13,
+      },
+      {
+        input: `
+          012345
+          123456
+          234567
+          345678
+          4.6789
+          56789.
+        `,
+        expected: 227,
+      },
+      { input, expected: 81 },
+    ],
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 });
