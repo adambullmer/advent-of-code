@@ -1,8 +1,37 @@
 import run from "aocrunner";
 
-const parseInput = (rawInput: string) => rawInput.split(" ");
+type StoneEntry = [string, number];
 
-function handleZero(_stone: string) {
+class Stones {
+  map: Map<string, number> = new Map();
+  constructor(stones: StoneEntry[]) {
+    for (const [stone, count] of stones) {
+      this.setStone(stone, count);
+    }
+  }
+
+  setStone(stone: string, count = 1) {
+    const existing = this.map.get(stone) ?? 0;
+
+    this.map.set(stone, existing + count);
+  }
+
+  total() {
+    let total = 0;
+    for (const count of this.map.values()) {
+      total += count;
+    }
+    return total;
+  }
+}
+
+const parseInput = (rawInput: string) => {
+  const map = new Stones(rawInput.split(" ").map((stone) => [stone, 1]));
+
+  return map;
+};
+
+function handleZero(stone: string) {
   return "1";
 }
 
@@ -15,7 +44,7 @@ function handleDefault(stone: string) {
   return `${Number.parseInt(stone, 10) * 2024}`;
 }
 
-function changeStone(stone: string): string[] {
+function changeStone(stone: string) {
   if (stone === "0") {
     return [handleZero(stone)];
   }
@@ -27,27 +56,28 @@ function changeStone(stone: string): string[] {
   return [handleDefault(stone)];
 }
 
-function blink(stones: string[]) {
-  for (let x = 0; x < stones.length; x++) {
-    const newStones = changeStone(stones[x]);
-    stones.splice(x, 1, ...newStones);
-    x += newStones.length - 1;
+function blink(stones: Stones) {
+  const newStones: StoneEntry[] = [];
+  for (const [stone, count] of stones.map.entries()) {
+    newStones.push(...changeStone(stone).map<StoneEntry>((stone) => [stone, count]));
   }
+
+  return new Stones(newStones);
 }
 
 const part1 = (rawInput: string) => {
-  const stones = parseInput(rawInput);
+  let stones = parseInput(rawInput);
 
   // console.log(stones);
 
   const totalBlinks = 25;
   for (let x = 0; x < totalBlinks; x++) {
-    console.log(`Blink ${x}:`, stones.length);
-    blink(stones);
+    // console.log(`Blink ${x}:`, stones.map.size, stones.total());
+    stones = blink(stones);
     // console.log(stones);
   }
 
-  return stones.length;
+  return stones.total();
 };
 
 const part2 = (rawInput: string) => {
