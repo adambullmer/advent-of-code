@@ -81,9 +81,18 @@ const part1 = (rawInput: string) => {
 };
 
 const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput);
+  let stones = parseInput(rawInput);
 
-  return;
+  // console.log(stones);
+
+  const totalBlinks = 75;
+  for (let x = 0; x < totalBlinks; x++) {
+    // console.log(`Blink ${x}:`, stones.length);
+    stones = blink(stones);
+    // console.log(stones);
+  }
+
+  return stones.total();
 };
 
 const input = `
@@ -96,9 +105,9 @@ run({
     solution: part1,
   },
   part2: {
-    tests: [{ input, expected: 1 }],
+    tests: [{ input, expected: 65601038650482 }],
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 });
