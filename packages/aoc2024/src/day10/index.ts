@@ -1,34 +1,12 @@
 import run from "aocrunner";
-import {
-  type Coordinates,
-  calculateCoordinates,
-  directions,
-} from "../utils/index.js";
-
-class Cell {
-  x = 0;
-  y = 0;
-
-  constructor(coord: Coordinates) {
-    this.setCoordinate(coord);
-  }
-
-  setCoordinate([x, y]: Coordinates) {
-    this.x = x;
-    this.y = y;
-  }
-
-  toChar(): string {
-    return ".";
-  }
-}
+import { Cell, type Coordinate, Grid, calculateCoordinates, directions, parseGrid } from "../utils/index.js";
 
 class ImpassableCell extends Cell {}
 
 class TrailCell extends Cell {
   elevation: number;
 
-  constructor(coord: Coordinates, char: string) {
+  constructor(coord: Coordinate, char: string) {
     super(coord);
 
     this.elevation = Number.parseInt(char, 10);
@@ -39,93 +17,43 @@ class TrailCell extends Cell {
   }
 }
 
-class Grid {
-  cells: Cell[][] = [];
-
-  constructor(cells: Cell[][]) {
-    this.cells = cells;
-  }
-
-  setCell(cell: Cell) {
-    this.cells[cell.y][cell.x] = cell;
-  }
-
-  getCell([x, y]: Coordinates) {
-    return this.cells[y][x];
-  }
-
-  toString() {
-    const gridString = this.cells
-      .map((line) => line.map((cell) => cell.toChar()).join(""))
-      .join("\n");
-    return `${gridString}\n`;
-  }
-}
-
 const parseInput = (rawInput: string) => {
-  const origins: Coordinates[] = [];
-  const grid = rawInput.split("\n").map((line, y) =>
-    line.split("").map((char, x) => {
-      const coords: Coordinates = [x, y];
+  const origins: Coordinate[] = [];
+  const cells = parseGrid(rawInput, (coords, char) => {
+    switch (char) {
+      case ".":
+        return new ImpassableCell(coords);
+      // biome-ignore lint/suspicious/noFallthroughSwitchClause: falls through
+      case "0":
+        origins.push(coords);
+      default:
+        return new TrailCell(coords, char);
+    }
+  });
 
-      switch (char) {
-        case ".":
-          return new ImpassableCell(coords);
-        // biome-ignore lint/suspicious/noFallthroughSwitchClause: falls through
-        case "0":
-          origins.push(coords);
-        default:
-          return new TrailCell(coords, char);
-      }
-    }),
-  );
+  const grid = new Grid(cells);
 
   return { grid, origins };
 };
 
-function isCoordinateInBounds([x, y]: Coordinates, grid: Cell[][]) {
-  if (y >= grid.length || y < 0 || x < 0 || x >= grid[0].length) {
-    return false;
-  }
-
-  return true;
-}
-
-const directionOptions = [
-  directions.Right,
-  directions.Down,
-  directions.Left,
-  directions.Up,
-];
-function* iterateDirections(coord: Coordinates, grid: Grid) {
+const directionOptions = [directions.Right, directions.Down, directions.Left, directions.Up];
+function* iterateDirections(coord: Coordinate, grid: Grid) {
   const elevation = (grid.getCell(coord) as TrailCell).elevation;
   const nextElevation = elevation + 1;
 
   for (const delta of directionOptions) {
     const nextCoord = calculateCoordinates(coord, delta);
-    if (
-      isCoordinateInBounds(nextCoord, grid.cells) &&
-      `${nextElevation}` === grid.getCell(nextCoord).toChar()
-    ) {
+    if (grid.isCoordinateInBounds(nextCoord) && `${nextElevation}` === grid.getCell(nextCoord).toChar()) {
       yield nextCoord;
     }
   }
 }
 
-function recurseTrail(
-  completeTrails: Coordinates[],
-  coord: Coordinates,
-  grid: Grid,
-  isDistinct = false,
-) {
+function recurseTrail(completeTrails: Coordinate[], coord: Coordinate, grid: Grid, isDistinct = false) {
   const current = (grid.getCell(coord) as TrailCell).elevation;
 
   if (current === 9) {
-    if (
-      isDistinct === true ||
-      completeTrails.findIndex(([x, y]) => x === coord[0] && y === coord[1]) ===
-        -1
-    ) {
+    if (isDistinct === true || completeTrails.findIndex(([x, y]) => x === coord[0] && y === coord[1]) === -1) {
       completeTrails.push(coord);
     }
     return true;
@@ -137,14 +65,13 @@ function recurseTrail(
 }
 
 const part1 = (rawInput: string) => {
-  const input = parseInput(rawInput);
-  const grid = new Grid(input.grid);
+  const { grid, origins } = parseInput(rawInput);
 
   console.log(grid.toString());
 
-  const allTrails: Coordinates[] = [];
-  for (const trailhead of input.origins) {
-    const found: Coordinates[] = [];
+  const allTrails: Coordinate[] = [];
+  for (const trailhead of origins) {
+    const found: Coordinate[] = [];
     recurseTrail(found, trailhead, grid);
     allTrails.push(...found);
   }
@@ -155,14 +82,13 @@ const part1 = (rawInput: string) => {
 };
 
 const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput);
-  const grid = new Grid(input.grid);
+  const { grid, origins } = parseInput(rawInput);
 
   console.log(grid.toString());
 
-  const allTrails: Coordinates[] = [];
-  for (const trailhead of input.origins) {
-    const found: Coordinates[] = [];
+  const allTrails: Coordinate[] = [];
+  for (const trailhead of origins) {
+    const found: Coordinate[] = [];
     recurseTrail(found, trailhead, grid, true);
     allTrails.push(...found);
   }

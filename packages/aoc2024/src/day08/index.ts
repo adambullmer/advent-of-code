@@ -1,117 +1,45 @@
 import run from "aocrunner";
-import { type Coordinates, calculateCoordinates } from "../utils/index.js";
-
-abstract class Cell {
-  x = 0;
-  y = 0;
-
-  constructor(coord: Coordinates) {
-    this.setCoordinate(coord);
-  }
-
-  setCoordinate([x, y]: Coordinates) {
-    this.x = x;
-    this.y = y;
-  }
-
-  toChar(): string {
-    return ".";
-  }
-}
+import { Cell, type Coordinate, Grid, calculateCoordinates, parseGrid } from "../utils/grid.js";
 
 class OpenCell extends Cell {
-  toChar(): string {
-    return ".";
-  }
+  character = ".";
 }
 
 class InterferenceCell extends Cell {
-  toChar(): string {
-    return "#";
-  }
+  character = "#";
 }
 
-class AntennaCell extends Cell {
-  char: string;
-  constructor(coordinates: Coordinates, char: string) {
-    super(coordinates);
-    this.char = char;
-  }
-
-  toChar(): string {
-    return this.char;
-  }
-}
-
-class Grid {
-  cells: Cell[][] = [];
-  // guard = new GuardCell([0, 0]);
-
-  constructor(cells: Cell[][]) {
-    this.cells = cells;
-    // for (let y = 0; y < cells.length; y++) {
-    //   for (let x = 0; x < cells[y].length; x++) {
-    //     if (this.getCell([x, y])) {
-    //       // this.guard.setCoordinate([x, y]);
-    //       this.setCell(new OpenCell([x, y]));
-    //     }
-    //   }
-    // }
-  }
-
-  setCell(cell: Cell) {
-    this.cells[cell.y][cell.x] = cell;
-  }
-
-  getCell([x, y]: Coordinates) {
-    return this.cells[y][x];
-  }
-
-  toString() {
-    return this.cells.map((line) => line.map((cell) => cell.toChar()).join("")).join("\n") + "\n";
-  }
-}
+class AntennaCell extends Cell {}
 
 const parseInput = (rawInput: string) => {
-  const antennaPairs: { [key: string]: Coordinates[] } = {};
+  const antennaPairs: { [key: string]: Coordinate[] } = {};
 
-  const grid = rawInput.split("\n").map((line, y) =>
-    line.split("").map((char, x) => {
-      const coordinates: Coordinates = [x, y];
+  const cells = parseGrid(rawInput, (coordinates, char) => {
+    switch (char) {
+      case ".":
+        return new OpenCell(coordinates);
+      case "#":
+        return new InterferenceCell(coordinates);
+      default:
+        if (antennaPairs[char] === undefined) {
+          antennaPairs[char] = [];
+        }
 
-      switch (char) {
-        case ".":
-          return new OpenCell(coordinates);
-        case "#":
-          return new InterferenceCell(coordinates);
-        default:
-          if (antennaPairs[char] === undefined) {
-            antennaPairs[char] = [];
-          }
+        antennaPairs[char].push(coordinates);
 
-          antennaPairs[char].push(coordinates);
-
-          return new AntennaCell(coordinates, char);
-      }
-    }),
-  );
+        return new AntennaCell(coordinates, char);
+    }
+  });
+  const grid = new Grid(cells);
   return { antennaPairs, grid };
 };
 
-function isCoordinateInBounds([x, y]: Coordinates, grid: Grid) {
-  if (y >= grid.cells.length || y < 0 || x < 0 || x >= grid.cells[0].length) {
-    return false;
-  }
-
-  return true;
-}
-
-function calculateSlope([x1, y1]: Coordinates, [x2, y2]: Coordinates): Coordinates {
+function calculateSlope([x1, y1]: Coordinate, [x2, y2]: Coordinate): Coordinate {
   return [x2 - x1, y2 - y1];
 }
 
-function iteratePairs(coordinates: Coordinates[], grid: Grid, repeat = false) {
-  const interferenceCoordinates: Coordinates[] = [];
+function iteratePairs(coordinates: Coordinate[], grid: Grid, repeat = false) {
+  const interferenceCoordinates: Coordinate[] = [];
 
   for (let x = 0; x < coordinates.length; x++) {
     const remainingCoordinates = coordinates.filter((_, y) => x !== y);
@@ -119,7 +47,7 @@ function iteratePairs(coordinates: Coordinates[], grid: Grid, repeat = false) {
       const slope = calculateSlope(coordinates[x], coord);
       const originCoordinate = repeat ? coordinates[x] : coord;
       let newCoordinate = calculateCoordinates(originCoordinate, slope);
-      while (isCoordinateInBounds(newCoordinate, grid)) {
+      while (grid.isCoordinateInBounds(newCoordinate)) {
         interferenceCoordinates.push(newCoordinate);
         if (repeat === false) {
           break;
@@ -133,14 +61,13 @@ function iteratePairs(coordinates: Coordinates[], grid: Grid, repeat = false) {
 }
 
 const part1 = (rawInput: string) => {
-  const input = parseInput(rawInput);
-  const grid = new Grid(input.grid);
+  const { grid, antennaPairs } = parseInput(rawInput);
   console.log(grid.toString());
 
-  for (const key in input.antennaPairs) {
-    iteratePairs(input.antennaPairs[key], grid)
-      .map((coordinate) => new InterferenceCell(coordinate))
-      .forEach((cell) => grid.setCell(cell));
+  for (const key in antennaPairs) {
+    for (const coordinate of iteratePairs(antennaPairs[key], grid)) {
+      grid.setCell(new InterferenceCell(coordinate));
+    }
   }
   console.log(grid.toString());
 
@@ -148,14 +75,13 @@ const part1 = (rawInput: string) => {
 };
 
 const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput);
-  const grid = new Grid(input.grid);
+  const { grid, antennaPairs } = parseInput(rawInput);
   console.log(grid.toString());
 
-  for (const key in input.antennaPairs) {
-    iteratePairs(input.antennaPairs[key], grid, true)
-      .map((coordinate) => new InterferenceCell(coordinate))
-      .forEach((cell) => grid.setCell(cell));
+  for (const key in antennaPairs) {
+    for (const coordinate of iteratePairs(antennaPairs[key], grid, true)) {
+      grid.setCell(new InterferenceCell(coordinate));
+    }
   }
   console.log(grid.toString());
 

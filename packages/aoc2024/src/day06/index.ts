@@ -1,9 +1,5 @@
 import run from "aocrunner";
-import {
-  type Coordinates,
-  calculateCoordinates,
-  directions,
-} from "../utils/index.js";
+import { Cell, Grid, calculateCoordinates, directions, parseGrid } from "../utils/grid.js";
 
 enum CellChar {
   Open = ".",
@@ -16,42 +12,17 @@ enum CellChar {
   GuardLeft = "<",
 }
 
-abstract class Cell {
-  x = 0;
-  y = 0;
-
-  constructor(coord: Coordinates) {
-    this.setCoordinate(coord);
-  }
-
-  setCoordinate([x, y]: Coordinates) {
-    this.x = x;
-    this.y = y;
-  }
-
-  toChar(): CellChar {
-    return CellChar.Open;
-  }
-}
-
 class OpenCell extends Cell {
-  toChar(): CellChar {
-    return CellChar.Open;
-  }
+  character = CellChar.Open;
 }
 
 class ObstacleCell extends Cell {
-  toChar() {
-    return CellChar.Obstacle;
-  }
+  character = CellChar.Obstacle;
 }
 
 class VisitedCell extends Cell {
+  character = CellChar.Visited;
   direction: CellChar[] = [];
-
-  toChar() {
-    return CellChar.Visited;
-  }
 }
 
 class GuardCell extends Cell {
@@ -60,16 +31,16 @@ class GuardCell extends Cell {
   nextDirection() {
     switch (this.direction) {
       case CellChar.GuardUp:
-        this.direction = CellChar.GuardRight;
+        this.character = this.direction = CellChar.GuardRight;
         break;
       case CellChar.GuardRight:
-        this.direction = CellChar.GuardDown;
+        this.character = this.direction = CellChar.GuardDown;
         break;
       case CellChar.GuardDown:
-        this.direction = CellChar.GuardLeft;
+        this.character = this.direction = CellChar.GuardLeft;
         break;
       case CellChar.GuardLeft:
-        this.direction = CellChar.GuardUp;
+        this.character = this.direction = CellChar.GuardUp;
         break;
     }
   }
@@ -89,18 +60,14 @@ class GuardCell extends Cell {
         return directions.Up;
     }
   }
-
-  toChar() {
-    return this.direction;
-  }
 }
 
-class Grid {
-  cells: Cell[][] = [];
+class FloorGrid extends Grid {
   guard = new GuardCell([0, 0]);
 
   constructor(cells: Cell[][]) {
-    this.cells = cells;
+    super(cells);
+
     for (let y = 0; y < cells.length; y++) {
       for (let x = 0; x < cells[y].length; x++) {
         if (this.getCell([x, y]) instanceof GuardCell) {
@@ -111,20 +78,9 @@ class Grid {
     }
   }
 
-  setCell(cell: Cell) {
-    this.cells[cell.y][cell.x] = cell;
-  }
-
-  getCell([x, y]: Coordinates) {
-    return this.cells[y][x];
-  }
-
   moveGuard() {
     const guard = this.guard;
-    const nextCoords = calculateCoordinates(
-      [this.guard.x, this.guard.y],
-      guard.getCoordinateDelta(),
-    );
+    const nextCoords = calculateCoordinates([this.guard.x, this.guard.y], guard.getCoordinateDelta());
 
     // If next move is out of bounds
     if (
@@ -144,17 +100,11 @@ class Grid {
       return true;
     }
 
-    if (
-      this.getCell([this.guard.x, this.guard.y]) instanceof VisitedCell ===
-      false
-    ) {
+    if (this.getCell([this.guard.x, this.guard.y]) instanceof VisitedCell === false) {
       this.setCell(new VisitedCell([guard.x, guard.y]));
     }
 
-    const previousCell = this.getCell([
-      this.guard.x,
-      this.guard.y,
-    ]) as VisitedCell;
+    const previousCell = this.getCell([this.guard.x, this.guard.y]) as VisitedCell;
     if (previousCell.direction.includes(guard.direction)) {
       return false;
     }
@@ -164,37 +114,27 @@ class Grid {
 
     return true;
   }
-
-  toString() {
-    return (
-      this.cells
-        .map((row) => row.map((cell) => cell.toChar()).join(""))
-        .join("\n") + "\n"
-    );
-  }
 }
 
 const parseInput = (rawInput: string) => {
-  const cells = rawInput.split("\n").map((rowString, rowIndex) => {
-    return rowString.split("").map((char, colIndex) => {
-      const coordinate: Coordinates = [colIndex, rowIndex];
-      switch (char) {
-        case CellChar.Obstacle:
-          return new ObstacleCell(coordinate);
-        case CellChar.Visited:
-          return new VisitedCell(coordinate);
-        case CellChar.GuardUp:
-        case CellChar.GuardRight:
-        case CellChar.GuardDown:
-        case CellChar.GuardLeft:
-          return new GuardCell(coordinate);
-        case CellChar.Open:
-        default:
-          return new OpenCell(coordinate);
-      }
-    });
+  const cells = parseGrid(rawInput, (coordinate, char) => {
+    switch (char) {
+      case CellChar.Obstacle:
+        return new ObstacleCell(coordinate);
+      case CellChar.Visited:
+        return new VisitedCell(coordinate);
+      case CellChar.GuardUp:
+      case CellChar.GuardRight:
+      case CellChar.GuardDown:
+      case CellChar.GuardLeft:
+        return new GuardCell(coordinate);
+      // case CellChar.Open:
+      default:
+        return new OpenCell(coordinate);
+    }
   });
-  return new Grid(cells);
+
+  return new FloorGrid(cells);
 };
 
 const part1 = (rawInput: string) => {

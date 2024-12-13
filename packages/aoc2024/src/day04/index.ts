@@ -1,45 +1,26 @@
 import run from "aocrunner";
-import {
-  type Coordinates,
-  calculateCoordinates,
-  directions,
-} from "../utils/index.js";
+import { Cell, type Coordinate, calculateCoordinates, directions, parseGrid } from "../utils/index.js";
 
-type Grid = string[][];
+type Grid = Cell[][];
 
 const parseInput = (rawInput: string) => {
-  const grid: string[][] = [];
-  for (const line of rawInput.split("\n")) {
-    grid.push(line.split(""));
-  }
-
-  return grid;
+  return parseGrid(rawInput, (coordinate, char) => new Cell(coordinate, char));
 };
 
 const word = "XMAS".split("");
 const cross = word.slice(1);
 
-function checkMatches(
-  grid: Grid,
-  [x, y]: Coordinates,
-  direction: Coordinates,
-  currentIndex: number,
-): boolean {
+function checkMatches(grid: Grid, [x, y]: Coordinate, direction: Coordinate, currentIndex: number): boolean {
   // console.log(grid[y][x], word[currentIndex]);
   if (currentIndex === word.length) {
     // console.log(true);
     return true;
   }
-  if (grid[y][x] !== word[currentIndex]) {
+  if (grid[y][x].toChar() !== word[currentIndex]) {
     // console.log(false);
     return false;
   }
-  return checkMatches(
-    grid,
-    calculateCoordinates([x, y], direction),
-    direction,
-    currentIndex + 1,
-  );
+  return checkMatches(grid, calculateCoordinates([x, y], direction), direction, currentIndex + 1);
 }
 
 const part1 = (rawInput: string) => {
@@ -52,7 +33,7 @@ const part1 = (rawInput: string) => {
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      if (input[y][x] === word[0]) {
+      if (input[y][x].toChar() === word[0]) {
         const hasDown = y + 3 < height;
         const hasUp = y - 3 >= 0;
         const hasLeft = x - 3 >= 0;
@@ -71,32 +52,16 @@ const part1 = (rawInput: string) => {
         if (hasRight && checkMatches(input, [x, y], directions.Right, 0)) {
           foundWords++;
         }
-        if (
-          hasDown &&
-          hasLeft &&
-          checkMatches(input, [x, y], directions.DownLeft, 0)
-        ) {
+        if (hasDown && hasLeft && checkMatches(input, [x, y], directions.DownLeft, 0)) {
           foundWords++;
         }
-        if (
-          hasUp &&
-          hasLeft &&
-          checkMatches(input, [x, y], directions.UpLeft, 0)
-        ) {
+        if (hasUp && hasLeft && checkMatches(input, [x, y], directions.UpLeft, 0)) {
           foundWords++;
         }
-        if (
-          hasDown &&
-          hasRight &&
-          checkMatches(input, [x, y], directions.DownRight, 0)
-        ) {
+        if (hasDown && hasRight && checkMatches(input, [x, y], directions.DownRight, 0)) {
           foundWords++;
         }
-        if (
-          hasUp &&
-          hasRight &&
-          checkMatches(input, [x, y], directions.UpRight, 0)
-        ) {
+        if (hasUp && hasRight && checkMatches(input, [x, y], directions.UpRight, 0)) {
           foundWords++;
         }
       }
@@ -106,13 +71,9 @@ const part1 = (rawInput: string) => {
   return foundWords;
 };
 
-function getNextCharacter(
-  grid: Grid,
-  coordinates: Coordinates,
-  direction: Coordinates,
-): string {
+function getNextCharacter(grid: Grid, coordinates: Coordinate, direction: Coordinate): string {
   const [x, y] = calculateCoordinates(coordinates, direction);
-  return grid[y][x];
+  return grid[y][x].toChar();
 }
 
 function isCrossCorner(letter: string) {
@@ -120,12 +81,10 @@ function isCrossCorner(letter: string) {
 }
 
 function checkCrossMatch(corner1: string, corner2: string) {
-  return (
-    isCrossCorner(corner1) && isCrossCorner(corner2) && corner1 !== corner2
-  );
+  return isCrossCorner(corner1) && isCrossCorner(corner2) && corner1 !== corner2;
 }
 
-function checkAround(grid: Grid, coordinates: Coordinates): boolean {
+function checkAround(grid: Grid, coordinates: Coordinate): boolean {
   const isDiagonalUpValid = checkCrossMatch(
     getNextCharacter(grid, coordinates, directions.UpRight),
     getNextCharacter(grid, coordinates, directions.DownLeft),
@@ -155,7 +114,7 @@ const part2 = (rawInput: string) => {
 
   for (let y = 1; y < height - 1; y++) {
     for (let x = 1; x < width - 1; x++) {
-      if (input[y][x] === cross[1]) {
+      if (input[y][x].toChar() === cross[1]) {
         // console.log(x, width, y, height, input[y][x], hasDown, hasUp, hasLeft, hasRight);
         if (checkAround(input, [x, y])) {
           foundWords++;
