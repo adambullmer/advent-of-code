@@ -85,8 +85,36 @@ const part1 = (rawInput: string) => {
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
+  const boundaries: Coordinate = [101, 103];
+  const seconds = 1;
 
-  return;
+  let secondsElapsed = 8279;
+  for (const robot of input) {
+    robot.move(secondsElapsed, boundaries);
+  }
+
+  while (true) {
+    secondsElapsed++;
+    const grid: string[][] = [];
+    for (let row = 0; row < boundaries[1]; row++) {
+      grid.push(".".repeat(boundaries[0]).split(""));
+    }
+
+    for (const robot of input) {
+      robot.move(seconds, boundaries);
+      grid[robot.position[1]][robot.position[0]] = "#";
+    }
+
+    console.log("seconds: ", secondsElapsed);
+    console.log("-".repeat(boundaries[0]));
+    console.log(grid.map((row) => row.join("")).join("\n"));
+
+    if (secondsElapsed >= 8280) {
+      break;
+    }
+  }
+
+  return secondsElapsed;
 };
 
 const input = `
