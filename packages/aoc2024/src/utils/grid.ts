@@ -1,6 +1,7 @@
 export type Coordinate = [number, number];
 export type CellHandler = (coordinate: Coordinate, character: string) => Cell;
 
+export type DirectionChar = "v" | "<" | ">" | "^";
 export const directions: Record<string, Coordinate> = {
   Up: [0, -1],
   Down: [0, 1],
@@ -11,6 +12,12 @@ export const directions: Record<string, Coordinate> = {
   DownRight: [1, 1],
   UpLeft: [-1, -1],
   DownLeft: [-1, 1],
+} as const;
+export const directionInstruction: Record<DirectionChar, Coordinate> = {
+  ">": directions.Right,
+  v: directions.Down,
+  "<": directions.Left,
+  "^": directions.Up,
 };
 
 export function calculateCoordinates([x, y]: Coordinate, [dx, dy]: Coordinate): Coordinate {
@@ -18,7 +25,7 @@ export function calculateCoordinates([x, y]: Coordinate, [dx, dy]: Coordinate): 
 }
 
 export class Cell {
-  coordinate = [0, 0];
+  coordinate: Coordinate = [0, 0];
   character = ".";
 
   constructor(coord: Coordinate, character?: string) {
