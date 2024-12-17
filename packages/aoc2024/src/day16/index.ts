@@ -135,7 +135,9 @@ class MazeGrid extends Grid {
       }
 
       const score = calculateSolutionScore(solution);
-      if (score <= cell.score) {
+      // A strict comparison removes potential equally valid routes that have costlier beginnings.
+      // This came up in the sample data. Adding a buffer for one extra turn.
+      if (score <= cell.score + 1000) {
         // Current route is better than or the same as a previous route. Update state
         cell.score = score;
       } else {
@@ -188,7 +190,26 @@ const part1 = (rawInput: string) => {
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  return;
+  input.traverse(input.start, ">", { rotations: 0, steps: 0, visited: [input.getCell(input.start)] });
+
+  const optimal = input.solutions.reduce((lowest, solution) => {
+    const solutionCost = calculateSolutionScore(solution);
+    return Math.min(lowest, solutionCost);
+  }, Number.POSITIVE_INFINITY);
+
+  for (const solution of input.solutions.filter((solution) => optimal === calculateSolutionScore(solution))) {
+    for (const cell of solution.visited) {
+      cell.character = "O";
+    }
+  }
+
+  console.log(input.toString());
+
+  return new Set(
+    input.solutions
+      .filter((solution) => optimal === calculateSolutionScore(solution))
+      .flatMap(({ visited }) => visited),
+  ).size;
 };
 
 const input = `
@@ -239,9 +260,33 @@ run({
     solution: part1,
   },
   part2: {
-    tests: [{ input, expected: 1 }],
+    tests: [
+      { input, expected: 45 },
+      {
+        input: `
+          #################
+          #...#...#...#..E#
+          #.#.#.#.#.#.#.#.#
+          #.#.#.#...#...#.#
+          #.#.#.#.###.#.#.#
+          #...#.#.#.....#.#
+          #.#.#.#.#.#####.#
+          #.#...#.#.#.....#
+          #.#.#####.#.###.#
+          #.#.#.......#...#
+          #.#.###.#####.###
+          #.#.#...#.....#.#
+          #.#.#.#####.###.#
+          #.#.#.........#.#
+          #.#.#.#########.#
+          #S#.............#
+          #################
+        `,
+        expected: 64,
+      },
+    ],
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 });
