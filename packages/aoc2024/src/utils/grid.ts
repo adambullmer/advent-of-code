@@ -27,6 +27,7 @@ export function calculateCoordinates([x, y]: Coordinate, [dx, dy]: Coordinate): 
 export class Cell {
   coordinate: Coordinate = [0, 0];
   character = ".";
+  visited = false;
 
   constructor(coord: Coordinate, character?: string) {
     this.setCoordinate(coord);
@@ -65,6 +66,10 @@ export class Grid {
   }
 
   getCell([x, y]: Coordinate) {
+    if (x < 0 || y < 0 || y >= this.cells.length || x >= this.cells[0].length) {
+      return undefined;
+    }
+
     return this.cells[y][x];
   }
 
