@@ -25,6 +25,38 @@ class MazeGrid extends Grid {
     this.end = size;
   }
 
+  // recursiveTraverse(currentCoordinate: Coordinate, visited: Cell[]): Cell[] | undefined {
+  //   const cell = this.getCell(currentCoordinate) as PathCell | WallCell | undefined;
+  //   // Next cell is a wall, or already visited
+  //   if (cell === undefined || cell instanceof WallCell || visited.includes(cell)) {
+  //     return;
+  //   }
+
+  //   // successful solution
+  //   if (cell.x === this.end[0] && cell.y === this.end[1]) {
+  //     // return cell.score;
+  //     return [...visited, cell];
+  //   }
+
+  //   const score = visited.length;
+  //   // A strict comparison removes potential equally valid routes that have costlier beginnings.
+  //   // This came up in the sample data. Adding a buffer for one extra turn.
+  //   if (score > cell.score) {
+  //     // Current score is worse than a previous route. Stop Traversing
+  //     return;
+  //   }
+  //   // Current route is better than or the same as a previous route. Update state
+  //   cell.score = score;
+
+  //   for (const direction of [">", "v", "<", "^"] as DirectionChar[]) {
+  //     const nextCoordinate = calculateCoordinates(currentCoordinate, directionInstruction[direction]);
+  //     const solution = this.recursiveTraverse(nextCoordinate, [...visited, cell]);
+  //     if (solution !== undefined) {
+  //       return solution;
+  //     }
+  //   }
+  // }
+
   iterativeTraverse(currentCoordinate: Coordinate): number {
     const startCell = this.getCell(currentCoordinate) as PathCell;
     startCell.score = 0;
@@ -87,13 +119,42 @@ function dropBytes(grid: Grid, bytes: number, coordinates: Coordinate[]) {
   }
 }
 
-const part1 = (rawInput: string) => {
-  const input = parseInput(rawInput);
+function binarySearch(min: number, max: number, testFn: (mid: number) => number) {
+  let left = min;
+  let right = max;
+  let mid = Math.floor(right - (right - left) / 2);
 
-  // const grid = createGrid([6, 6]);
-  // dropBytes(grid, 12, input);
-  const grid = createGrid([70, 70]);
-  dropBytes(grid, 1024, input);
+  while (left < right) {
+    const result = testFn(mid);
+    const result2 = testFn(mid + 1);
+
+    if (result !== 0 && result2 === 0) {
+      return mid;
+    }
+
+    if (result > 0) {
+      left = mid;
+    } else {
+      right = mid;
+    }
+
+    mid = Math.floor(left + (right - left) / 2);
+  }
+
+  return -1;
+}
+
+function part1(rawInput: string) {
+  const input = parseInput(rawInput);
+  const bytes = input.length >= 1024 ? 1024 : 12;
+
+  const bounds: Coordinate = [
+    Math.max(...new Set(input.flatMap(([x]) => x))),
+    Math.max(...new Set(input.flatMap(([, y]) => y))),
+  ];
+
+  const grid = createGrid(bounds);
+  dropBytes(grid, bytes, input);
 
   console.log(grid.toString());
 
@@ -102,12 +163,25 @@ const part1 = (rawInput: string) => {
   console.log(grid.toString());
 
   return score;
-};
+}
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
+  const bounds: Coordinate = [
+    Math.max(...new Set(input.map(([x]) => x))),
+    Math.max(...new Set(input.map(([, y]) => y))),
+  ];
 
-  return;
+  const maxBytes = binarySearch(12, input.length - 1, (bytes) => {
+    const grid = createGrid(bounds);
+    dropBytes(grid, bytes, input);
+
+    const score = grid.iterativeTraverse([0, 0]) ?? 0;
+
+    return score;
+  });
+
+  return input[maxBytes].join(",");
 };
 
 const input = `
@@ -144,9 +218,9 @@ run({
     solution: part1,
   },
   part2: {
-    tests: [{ input, expected: 1 }],
+    tests: [{ input, expected: "6,1" }],
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 });
