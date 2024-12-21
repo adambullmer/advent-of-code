@@ -50,6 +50,32 @@ function checkPattern(pattern: string, towelMap: Towels) {
   return false;
 }
 
+function enumeratePattern(pattern: string, towelMap: Towels, cache: Record<string, number>): number {
+  if (pattern === "") {
+    return 1;
+  }
+
+  if (cache[pattern] !== undefined) {
+    return cache[pattern];
+  }
+
+  let total = 0;
+  let end = towelMap.bounds.min;
+  while (end <= towelMap.bounds.max && end <= pattern.length) {
+    if (!towelMap.map[pattern.slice(0, end)]) {
+      end++;
+      continue;
+    }
+
+    total += enumeratePattern(pattern.slice(end), towelMap, cache);
+    end++;
+  }
+
+  cache[pattern] = total;
+
+  return total;
+}
+
 const part1 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
@@ -59,7 +85,7 @@ const part1 = (rawInput: string) => {
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput);
 
-  return;
+  return input.patterns.reduce((total, pattern) => total + enumeratePattern(pattern, input.towels, {}), 0);
 };
 
 const input = `
@@ -81,7 +107,7 @@ run({
     solution: part1,
   },
   part2: {
-    tests: [{ input, expected: 1 }],
+    tests: [{ input, expected: 16 }],
     solution: part2,
   },
   trimTestInputs: true,
